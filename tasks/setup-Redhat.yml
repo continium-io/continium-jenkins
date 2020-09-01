@@ -1,0 +1,45 @@
+---
+# tasks file for jenkins
+
+- name: Ensure dependencies are installed.
+  package:
+    name:
+      - curl
+      - initscripts
+      - java-1.8.0-openjdk
+    state: present
+
+- name: Ensure Jenkins repo is installed.
+  get_url:
+    url: "{{ redhat_jenkins_repo_url }}"
+    dest: /etc/yum.repos.d/jenkins.repo
+  # when: jenkins_repo_url | default(false)
+
+- name: Add Jenkins repo GPG key.
+  rpm_key:
+    state: present
+    key: "{{ redhat_jenkins_repo_key_url }}"
+  # when: jenkins_repo_url | default(false)
+
+
+- name: Ensure Jenkins is installed.
+  package:
+    name: jenkins
+    state: latest
+
+- name: Make sure a service is running
+  systemd:
+    state: started
+    name: jenkins
+
+- name: Wait 3 seconds for created password file.
+  wait_for:
+    timeout: 3
+
+- name: Save admin password
+  shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+  register: admin_pass
+
+- name: Show admin pass
+  debug:
+    msg: "{{ admin_pass.stdout }}"

@@ -1,0 +1,42 @@
+---
+# tasks file for jenkins
+
+- name: Update apt cache.
+  apt: update_cache=true cache_valid_time=600
+
+- name: Ensure depencidencies
+  apt: 
+    name: 
+      - curl
+      - apt-transport-https
+      - gnupg
+      - default-jre
+    state: present
+
+- name: Add Jenkins apt repository key.
+  apt_key:
+    url: "{{ deb_jenkins_repo_key_url }}"
+    state: present
+
+- name: Add Jenkins apt repository.
+  apt_repository:
+    repo: "{{ deb_jenkins_repo_url }}"
+    state: present
+    update_cache: true
+
+- name: Ensure Jenkins is installed.
+  apt:
+    name: jenkins
+    state: latest
+
+- name: Wait 3 seconds for created password file.
+  wait_for:
+    timeout: 3
+
+- name: Save admin password
+  shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+  register: admin_pass
+
+- name: Show admin pass
+  debug:
+    msg: "{{ admin_pass.stdout }}"

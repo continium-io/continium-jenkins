@@ -1,0 +1,10 @@
+---
+# tasks file for jenkins
+
+- name: Include Debian based tasks
+  include_tasks: setup-Debian.yml
+  when: ansible_os_family == "Debian"
+
+- name: Include Red-Hat based tasks
+  include_tasks: setup-Redhat.yml
+  when: ansible_os_family == "RedHat"
