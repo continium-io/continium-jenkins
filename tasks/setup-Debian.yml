@@ -24,10 +24,16 @@
     state: present
     update_cache: true
 
-- name: Ensure Jenkins is installed.
+- name: Install Jenkins.
   apt:
     name: jenkins
     state: latest
+
+- name: Check local connecition for Jenkins.
+  uri:
+    url: http://localhost:8080
+  ignore_errors: yes
+
 
 - name: Wait 3 seconds for created password file.
   wait_for:

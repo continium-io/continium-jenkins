@@ -22,7 +22,7 @@
   # when: jenkins_repo_url | default(false)
 
 
-- name: Ensure Jenkins is installed.
+- name: Install Jenkins.
   package:
     name: jenkins
     state: latest
@@ -31,6 +31,11 @@
   systemd:
     state: started
     name: jenkins
+
+- name: Check local connecition for Jenkins.
+  uri:
+    url: http://localhost:8080
+  ignore_errors: yes
 
 - name: Wait 3 seconds for created password file.
   wait_for:
